@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* Hacker House Goa Theme - Dark Hacker + Tropical Fusion */
+    --bg: #0a0e0f;
+    --bg-lift: #141a1c;
+    --border: rgba(0, 255, 170, 0.12);
+    --border-hot: rgba(0, 255, 170, 0.24);
+    --fg: #e0ffef;
+    --fg-dim: #94a89c;
+    --fg-faint: #576660;
+    
+    /* Primary accents - neon hacker + tropical warmth */
+    --signal: #00ffaa;
+    --signal-cyan: #00d9ff;
+    --signal-orange: #ff6b35;
+    --signal-teal: #14b8a6;
+    
+    /* Status colors */
+    --grounded: #00ffaa;
+    --abstain: #fbbf24;
+    --refuse: #ef4444;
+    
+    /* Font families */
+    --mono: var(--font-mono), "Fira Code", monospace;
+    --display: var(--font-display), "Space Grotesk", system-ui, sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-display), system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+}
+
+.app-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* Matrix rain glow effect */
+@keyframes matrixGlow {
+  0%, 100% { opacity: 0.4; text-shadow: 0 0 8px rgba(0, 255, 170, 0.8); }
+  50% { opacity: 1; text-shadow: 0 0 16px rgba(0, 255, 170, 1), 0 0 32px rgba(0, 255, 170, 0.5); }
+}
+
+.animate-matrix-glow {
+  animation: matrixGlow 2s ease-in-out infinite;
+}
+
+/* Recording sonar pulse */
+@keyframes sonarExpand {
+  0% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+.animate-sonar {
+  animation: sonarExpand 1.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+/* Neon glow hover effect for buttons */
+@keyframes neonGlow {
+  0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 170, 0.4), 0 0 20px rgba(0, 255, 170, 0.2); }
+  50% { box-shadow: 0 0 20px rgba(0, 255, 170, 0.6), 0 0 40px rgba(0, 255, 170, 0.3), 0 0 60px rgba(0, 255, 170, 0.1); }
+}
+
+.hover-neon-glow:hover {
+  animation: neonGlow 1.5s ease-in-out infinite;
+}
+
+/* Tropical palm tree sway */
+@keyframes palmSway {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(2deg); }
+  75% { transform: rotate(-2deg); }
+}
+
+.animate-palm-sway {
+  animation: palmSway 4s ease-in-out infinite;
+  transform-origin: bottom center;
+}
