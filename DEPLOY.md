@@ -1,339 +1,311 @@
-# 🚀 Deployment Guide - Hacker House Goa Voice RAG
+# Deployment Guide
 
-## Quick Deploy to Vercel (5 Minutes)
+Deploy the Voice RAG system to production environments.
 
-### Option 1: Deploy via Vercel CLI
+## Deployment Options
+
+### Option 1: Vercel (Recommended)
+
+Vercel is the easiest deployment option for Next.js applications.
+
+#### Prerequisites
+- GitHub account
+- Vercel account (free tier available)
+- Repository pushed to GitHub
+
+#### Steps
+
+1. **Connect Repository**
+   - Go to [vercel.com](https://vercel.com)
+   - Sign up/Login with GitHub
+   - Click "New Project"
+   - Import your repository: `arv25rahul/hhg-task2-voice-rag`
+
+2. **Configure Environment Variables**
+   Add these in Vercel dashboard:
+   ```
+   PINECONE_API_KEY=your_key
+   PINECONE_INDEX=your_index
+   OPENAI_API_KEY=your_key
+   ```
+
+3. **Deploy**
+   - Click "Deploy"
+   - Wait 2-3 minutes for build
+   - Get your live URL: `https://your-project.vercel.app`
+
+4. **Custom Domain (Optional)**
+   - Go to Project Settings → Domains
+   - Add your custom domain
+   - Update DNS records as instructed
+
+#### Vercel CLI Deployment
 
 ```bash
-# Install Vercel CLI globally (one time)
-npm install -g vercel
+# Install Vercel CLI
+npm i -g vercel
 
-# Login to Vercel
+# Login
 vercel login
 
+# Deploy
+vercel
+
 # Deploy to production
-cd c:\Users\Drago\Downloads\hhgoa_task_2-main\hhgoa_task_2-main
 vercel --prod
 ```
 
-### Option 2: Deploy via GitHub + Vercel Dashboard
+### Option 2: Netlify
 
-1. **Push to GitHub**
-   ```bash
-   git init
-   git add .
-   git commit -m "Hacker House Goa theme + production ready"
-   git branch -M main
-   git remote add origin https://github.com/YOUR_USERNAME/hhgoa-voice-rag.git
-   git push -u origin main
+#### Steps
+
+1. **Connect Repository**
+   - Go to [netlify.com](https://netlify.com)
+   - Click "Add new site" → "Import existing project"
+   - Connect GitHub and select repository
+
+2. **Build Settings**
+   ```
+   Build command: npm run build
+   Publish directory: .next
    ```
 
-2. **Connect to Vercel**
-   - Go to https://vercel.com/new
-   - Import your GitHub repository
-   - Vercel auto-detects Next.js settings
-   - Click "Deploy"
+3. **Environment Variables**
+   Add in Site Settings → Environment Variables
 
-3. **Add Environment Variables in Vercel Dashboard**
-   - Go to Project Settings → Environment Variables
-   - Add these variables:
-     ```
-     MONGODB_URI
-     OPENROUTER_API_KEY
-     SARVAM_API_KEY (optional)
-     ELEVENLABS_API_KEY (optional)
-     ```
+4. **Deploy**
+   Click "Deploy site"
 
----
+### Option 3: Docker
 
-## 🔐 Environment Variables Setup
+#### Dockerfile
 
-### In Vercel Dashboard:
+```dockerfile
+FROM node:18-alpine
 
-| Variable Name | Value | Required |
-|---------------|-------|----------|
-| `MONGODB_URI` | `mongodb+srv://user:pass@cluster.mongodb.net/` | ✅ Yes |
-| `OPENROUTER_API_KEY` | `sk-or-v1-your-key` | ✅ Yes |
-| `SARVAM_API_KEY` | Your Sarvam key | ⚠️ Optional (voice) |
-| `ELEVENLABS_API_KEY` | Your ElevenLabs key | ⚠️ Optional (voice) |
-| `MONGODB_DATABASE` | `ai_demo` | ℹ️ Default provided |
-| `MONGODB_COLLECTION` | `chunks` | ℹ️ Default provided |
+WORKDIR /app
 
----
+COPY package*.json ./
+RUN npm ci --only=production
 
-## 📦 Pre-Deployment Checklist
+COPY . .
+RUN npm run build
 
-Run these commands to verify everything works:
+EXPOSE 3000
 
-```powershell
-# 1. Install dependencies
+CMD ["npm", "start"]
+```
+
+#### Build and Run
+
+```bash
+# Build image
+docker build -t voice-rag .
+
+# Run container
+docker run -p 3000:3000 \
+  -e PINECONE_API_KEY=your_key \
+  -e PINECONE_INDEX=your_index \
+  -e OPENAI_API_KEY=your_key \
+  voice-rag
+```
+
+#### Docker Compose
+
+```yaml
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+    restart: unless-stopped
+```
+
+Run: `docker-compose up -d`
+
+### Option 4: AWS (EC2 or Elastic Beanstalk)
+
+#### EC2 Deployment
+
+1. **Launch EC2 Instance**
+   - AMI: Ubuntu 22.04
+   - Instance type: t2.micro or higher
+   - Security group: Allow ports 22, 80, 443, 3000
+
+2. **Connect and Setup**
+```bash
+# SSH into instance
+ssh -i your-key.pem ubuntu@your-ip
+
+# Install Node.js
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Clone repository
+git clone https://github.com/arv25rahul/hhg-task2-voice-rag.git
+cd hhg-task2-voice-rag
+
+# Install dependencies
 npm install
 
-# 2. Run type checking
-npx tsc --noEmit
+# Setup environment
+nano .env.local  # Add your keys
 
-# 3. Run build
+# Build
 npm run build
 
-# 4. Test production build locally
-npm run start
+# Install PM2 for process management
+sudo npm install -g pm2
 
-# 5. Open http://localhost:3000 and test all features
+# Start app
+pm2 start npm --name "voice-rag" -- start
+
+# Auto-start on reboot
+pm2 startup
+pm2 save
 ```
 
----
+3. **Setup Nginx (Optional)**
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
 
-## 🌐 Custom Domain Setup (Optional)
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
 
-### After Deploying to Vercel:
-
-1. **In Vercel Dashboard:**
-   - Go to Project → Settings → Domains
-   - Add your custom domain (e.g., `hhg-rag.yourdomain.com`)
-
-2. **In Your DNS Provider:**
-   - Add CNAME record pointing to your Vercel deployment
-   - Example: `hhg-rag` → `your-project.vercel.app`
-
-3. **SSL Certificate:**
-   - Vercel automatically provisions SSL (1-2 minutes)
-
----
-
-## 🗄️ MongoDB Atlas Setup for Production
-
-### Create Production Cluster:
-
-1. **Create Cluster**
-   - Log in to MongoDB Atlas
-   - Create M0 FREE tier cluster (or paid tier for production)
-   - Choose closest region to your users
-
-2. **Configure Network Access**
-   - Database Access → Add User (create strong password)
-   - Network Access → Allow 0.0.0.0/0 (or specific Vercel IPs)
-
-3. **Create Vector Search Index**
-   ```javascript
-   // In Atlas Search → Create Search Index
-   {
-     "fields": [
-       {
-         "type": "vector",
-         "path": "embedding",
-         "numDimensions": 1536,
-         "similarity": "cosine"
-       }
-     ]
-   }
-   ```
-   - Index name: `vector_index`
-   - Database: `ai_demo`
-   - Collection: `chunks`
-
-4. **Index Sample Data**
-   ```bash
-   # Set your MongoDB URI in .env.local first
-   npx tsx scripts/index-data.ts
-   ```
-
----
-
-## 🔍 Post-Deployment Verification
-
-### Test These Features:
-
-1. ✅ **Homepage loads** with matrix rain background
-2. ✅ **Text query works** (type a question in the input)
-3. ✅ **Voice recording** (click mic button - needs API keys)
-4. ✅ **Vector explorer** loads chunks from MongoDB
-5. ✅ **Benchmark** runs successfully
-6. ✅ **Responsive** design on mobile
-7. ✅ **Error messages** are helpful (if API keys missing)
-
-### Performance Check:
+### Option 5: Railway
 
 ```bash
-# Run Lighthouse audit
-npx lighthouse https://your-domain.vercel.app --view
+# Install Railway CLI
+npm i -g @railway/cli
 
-# Target scores:
-# Performance: 90+
-# Accessibility: 95+
-# Best Practices: 95+
-# SEO: 90+
+# Login
+railway login
+
+# Initialize
+railway init
+
+# Add environment variables
+railway variables set PINECONE_API_KEY=your_key
+railway variables set PINECONE_INDEX=your_index
+railway variables set OPENAI_API_KEY=your_key
+
+# Deploy
+railway up
 ```
 
----
+## Environment Configuration
 
-## 🐛 Troubleshooting Deployment
+### Production Environment Variables
 
-### Build Fails on Vercel:
+Always set these in your deployment platform:
 
-**Error: "Module not found"**
-```bash
-# Solution: Clear cache and rebuild
-vercel --force
+```env
+NODE_ENV=production
+PINECONE_API_KEY=<your_key>
+PINECONE_INDEX=<your_index>
+OPENAI_API_KEY=<your_key>
 ```
 
-**Error: "Environment variable not defined"**
-```bash
-# Solution: Add all required env vars in Vercel dashboard
-# Go to Settings → Environment Variables
+### Security Best Practices
+
+1. **Never commit secrets**
+   - Use environment variables
+   - Keep `.env.local` out of version control
+
+2. **Use HTTPS**
+   - Required for voice API
+   - Most platforms provide free SSL
+
+3. **Rate Limiting**
+   - Implement API rate limits
+   - Monitor API usage
+
+4. **CORS Configuration**
+   - Set appropriate CORS headers
+   - Whitelist trusted domains only
+
+## Post-Deployment Checklist
+
+- ✅ Application loads without errors
+- ✅ API endpoints respond correctly
+- ✅ Voice interface works (requires HTTPS)
+- ✅ Vector search returns results
+- ✅ AI responses generate properly
+- ✅ Environment variables set correctly
+- ✅ Custom domain configured (if applicable)
+- ✅ SSL certificate active
+- ✅ Error monitoring setup
+- ✅ Performance metrics tracked
+
+## Monitoring and Maintenance
+
+### Vercel Analytics
+- Built-in analytics available
+- Monitor performance and usage
+- Track Web Vitals
+
+### Error Tracking
+Consider integrating:
+- Sentry
+- LogRocket
+- Datadog
+
+### Logging
+```typescript
+// Add logging to API routes
+console.log('[API]', request.method, request.url);
+console.error('[ERROR]', error);
 ```
 
-### MongoDB Connection Fails:
+## Troubleshooting Deployment
 
-**Error: "Connection refused"**
-```bash
-# Solutions:
-1. Check Network Access whitelist in Atlas (add 0.0.0.0/0)
-2. Verify connection string format
-3. Ensure user has correct permissions
-```
+### Build Fails
+- Check Node.js version matches requirements
+- Verify all dependencies installed
+- Review build logs for specific errors
 
-### Voice Recording Not Working:
+### Environment Variables Not Working
+- Restart deployment after adding vars
+- Check variable names match exactly
+- Ensure no trailing spaces in values
 
-**Error: "getUserMedia not supported"**
-```bash
-# Solutions:
-1. Ensure HTTPS is enabled (required for microphone)
-2. Check browser permissions
-3. Use Chrome/Firefox (best support)
-```
+### API Routes Fail
+- Verify base URL configuration
+- Check API keys are valid
+- Review CORS settings
 
----
+### Voice Not Working in Production
+- Confirm HTTPS is enabled
+- Check browser console for errors
+- Verify microphone permissions
 
-## 📊 Monitoring & Analytics
+## Scaling Considerations
 
-### Vercel Analytics (Built-in):
+### For High Traffic
+- Use CDN for static assets
+- Enable caching
+- Consider serverless functions
+- Use Redis for session management
+- Implement load balancing
 
-- Real-time visitor tracking
-- Performance metrics
-- Error logs
-
-### Optional Tools:
-
-- **Sentry** for error tracking
-- **PostHog** for product analytics
-- **Vercel Speed Insights** for Core Web Vitals
-
----
-
-## 🔄 Continuous Deployment
-
-### Auto-Deploy on Git Push:
-
-Once connected to GitHub, Vercel automatically:
-1. Detects new commits
-2. Builds the project
-3. Runs tests (if configured)
-4. Deploys to production
-5. Sends deployment notification
-
-### Branch Previews:
-
-- Every pull request gets its own preview URL
-- Test changes before merging to main
+### Cost Optimization
+- Monitor API usage
+- Set usage limits
+- Cache frequent queries
+- Optimize vector search queries
 
 ---
-
-## 💰 Cost Estimation
-
-### Free Tier Usage:
-
-**Vercel:**
-- ✅ Hobby plan: 100GB bandwidth/month
-- ✅ Unlimited deployments
-- ✅ Automatic SSL
-- ✅ Global CDN
-
-**MongoDB Atlas:**
-- ✅ M0 FREE: 512MB storage
-- ✅ Shared cluster
-- ✅ Perfect for testing/demos
-
-**OpenRouter:**
-- 💳 Pay-as-you-go: ~$0.10 per 1000 requests
-- 💳 Free tier available for testing
-
-**Estimated Monthly Cost: $0-$5** for demo/testing
-
----
-
-## 🚀 Production Scaling
-
-### When you need to scale:
-
-1. **Upgrade MongoDB Atlas**
-   - M2 tier: $9/month
-   - M5 tier: $25/month (recommended for production)
-
-2. **Upgrade Vercel**
-   - Pro: $20/month per user
-   - Needed for: Team collaboration, advanced analytics
-
-3. **Add Caching**
-   - Redis for embedding cache
-   - Reduces OpenRouter costs
-
----
-
-## 📝 Deployment Commands Reference
-
-```bash
-# Development
-npm run dev              # Start dev server
-
-# Production Build
-npm run build           # Build for production
-npm run start           # Start production server
-
-# Vercel Commands
-vercel                  # Deploy to preview
-vercel --prod          # Deploy to production
-vercel logs            # View deployment logs
-vercel env ls          # List environment variables
-vercel domains         # Manage domains
-
-# Type Checking
-npx tsc --noEmit       # Check TypeScript errors
-
-# Linting
-npm run lint           # Run ESLint
-```
-
----
-
-## ✅ Final Deployment Checklist
-
-Before going live:
-
-- [ ] All environment variables configured in Vercel
-- [ ] MongoDB Atlas cluster created with vector index
-- [ ] Sample data indexed (`npm run tsx scripts/index-data.ts`)
-- [ ] Build succeeds locally (`npm run build`)
-- [ ] All features tested locally
-- [ ] Custom domain configured (optional)
-- [ ] SSL certificate active
-- [ ] Analytics configured (optional)
-- [ ] Error tracking setup (optional)
-- [ ] README updated with live URL
-- [ ] Project shared with team/hackathon
-
----
-
-## 🎉 You're Ready!
-
-Your Hacker House Goa Voice RAG is now:
-- ✅ Fully themed and branded
-- ✅ Production-ready code
-- ✅ Deployed and accessible worldwide
-- ✅ Monitored and optimized
-
-**Live URL:** `https://your-project.vercel.app` 🚀
-
----
-
-**Built with 🌴 & ⚡ at Hacker House Goa 2026**
-**#RAGInGoa**
+Team RoopX - Deployment Guide
