@@ -1,7 +1,7 @@
 # 🌴⚡ Hacker House Goa Voice RAG — Tropical Tech Meets Terminal Speed
 
 > **Terminal-Speed Voice Retrieval-Augmented Generation with Tropical Vibes**  
-> **Sub-200ms** multilingual RAG for Hindi, Marathi & English  
+> **Sub-200ms** multilingual RAG for Hindi, English  
 > Built by **Team Probix** for [**Hacker House Goa 2026**](https://hhgoa.com/) · **Task 2 Submission**  
 > **Mandatory Hashtag**: **`#RAGInGoa`**
 
