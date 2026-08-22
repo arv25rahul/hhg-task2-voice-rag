@@ -2,7 +2,6 @@
 
 import { InteractiveBg } from "@/components/InteractiveBg";
 import { TelemetryProfiler } from "@/components/TelemetryProfiler";
-import { VectorExplorer } from "@/components/VectorExplorer";
 import { VoiceInterface } from "@/components/VoiceInterface";
 import gsap from "gsap";
 import { Zap } from "lucide-react";
