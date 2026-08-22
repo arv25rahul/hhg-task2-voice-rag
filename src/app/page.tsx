@@ -170,10 +170,7 @@ export default function Home() {
           <VoiceInterface />
         </section>
 
-        {/* Live Vector Database Chunks Explorer (Connected to MongoDB Atlas) */}
-        <section ref={chunksSectionRef} id="vector-chunks" className="w-full pt-8 border-t border-[#00ffaa]/10 opacity-0">
-          <VectorExplorer />
-        </section>
+      
 
         {/* Live Latency Telemetry Profiler & Benchmark Engine */}
         <section ref={telemetrySectionRef} id="telemetry-architecture" className="w-full pt-8 border-t border-[#00ffaa]/10 opacity-0">
