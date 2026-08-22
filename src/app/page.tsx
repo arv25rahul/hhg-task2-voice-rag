@@ -134,7 +134,7 @@ export default function Home() {
 
           {/* Main Headline */}
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white leading-tight font-sans">
-            Tropical Tech Meets{" "}
+            RoopX Meets{" "}
             <span className="bg-gradient-to-r from-[#00ffaa] via-[#00d9ff] to-[#ff6b35] bg-clip-text text-transparent">
               Terminal Speed
             </span>
@@ -142,7 +142,7 @@ export default function Home() {
 
           {/* Subtitle */}
           <p className="text-sm sm:text-base text-[#94a89c] max-w-2xl mx-auto leading-relaxed font-sans">
-            Speak in Hindi, Marathi, or English. Get vector-grounded answers from{" "}
+            Speak in Hindi or English. Get vector-grounded answers from{" "}
             <span className="text-[#e0ffef] font-mono text-xs px-1.5 py-0.5 rounded bg-[#141a1c] border border-[#00ffaa]/20">
               ai4bharat/MSMARCO-XI
             </span>{" "}
@@ -249,7 +249,7 @@ export default function Home() {
                 </a>
               </li>
               <li className="text-[#94a89c]">241,572 Multilingual Chunks</li>
-              <li className="text-[#94a89c]">Hindi · Marathi · English</li>
+              <li className="text-[#94a89c]">Hindi · English</li>
             </ul>
           </div>
 
@@ -259,7 +259,7 @@ export default function Home() {
               Submission & Team
             </span>
             <div className="text-[#e0ffef] text-xs">
-              Built with 🌴 & ⚡ by <strong className="text-white font-bold">Team Probix</strong>
+              Built with 🌴 & ⚡ by <strong className="text-white font-bold">Team RoopX</strong>
             </div>
             <a
               href="https://hhgoa.com/"
